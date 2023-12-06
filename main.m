@@ -1,6 +1,10 @@
 % Read input image as a grayscale image 
 inputImage = rgb2gray(imread('input.jpg'));
 
+imDim = size(inputImage);
+rowSize = imDim(1);
+colSize = imDim(2); 
+
 % Sharpen the image
 improvedImage = sharpImage(inputImage);
 
@@ -25,7 +29,54 @@ binarizedImage = hSegment(binarizedImage,50,300);
 binarizedImage = cropImage(binarizedImage,12,103,10,350);
 
 % Show license plate number
-imshow(binarizedImage);
+% imshow(binarizedImage);
+
+%Visualize horizontal and vertical project of an image
+
+rowVals = zeros(1,rowSize);
+colVals = zeros(1,colSize); 
+
+for i = 1:rowSize
+    rowVals(i) = sum(binarizedImage(i,:))./255;
+end
+
+for i = 1:colSize
+    colVals(i) = sum(binarizedImage(:,i))./255;
+end
+
+% Display horizontal project
+% barh(rowVals);
+% Display vertical project
+% bar(colVals);
+
+segmentedChars = charLevelSegmentation(binarizedImage,colVals,colSize);
+
+imshow(segmentedChars{1});
+
+function segmentedChars = charLevelSegmentation(binarizedImage,colVals,colSize)
+    segmentedChars = {};
+
+    upperXPixel = 89;
+    lowerXPixel = 20; 
+
+    thresholdBorderBoxWidth = 15; 
+    
+    firstWhite = 0;
+
+    for i =1:colSize
+        if(i < colSize && colVals(i + 1) > 0 && colVals(i) == 0)
+            firstWhite = i;
+        elseif(colVals(i) == 0)
+            width = i - firstWhite;
+
+            if(width > thresholdBorderBoxWidth)
+                charImage = binarizedImage(lowerXPixel:upperXPixel, firstWhite:i);
+                segmentedChars = [segmentedChars,charImage];
+            end
+            firstWhite = i;
+        end
+    end
+end
 
 function binarizedImage = cropImage(binarizedImage, xLower,xUpper,yLower,yUpper)
 
