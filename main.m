@@ -56,8 +56,8 @@ imshow(segmentedChars{1});
 function segmentedChars = charLevelSegmentation(binarizedImage,colVals,colSize)
     segmentedChars = {};
 
-    upperXPixel = 89;
-    lowerXPixel = 20; 
+    upperXPixel = 91;
+    lowerXPixel = 19; 
 
     thresholdBorderBoxWidth = 15; 
     
